@@ -25,3 +25,7 @@ jobs:
 
       - name: Run unit tests
         run: python -m unittest test_solution.py -v
+      - name: Measure test coverage
+        run: |
+          python -m coverage run -m unittest test_solution.py
+          python -m coverage report -m
