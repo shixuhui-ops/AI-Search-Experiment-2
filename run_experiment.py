@@ -128,3 +128,31 @@ print("Alpha-Beta H=2:", treasure_alpha_beta(
 print("Alpha-Beta H=4:", treasure_alpha_beta(
     distances, names, values, 4
 ))
+
+print()
+print("边界情况测试")
+
+blocked_maze = [
+    ["S", "X", "E"],
+    ["X", "X", "X"],
+    [".", ".", "."],
+]
+
+print(
+    "迷宫无解:",
+    astar_path((0, 0), (0, 2), blocked_maze)
+)
+
+blocked_weighted_grid = [
+    ["S", "X", 1],
+    [1, "X", "E"],
+]
+
+print(
+    "加权地图无解:",
+    weighted_astar_cost(
+        (0, 0),
+        (1, 2),
+        blocked_weighted_grid
+    )
+)
