@@ -1,5 +1,5 @@
 import heapq
-
+from functools import lru_cache
 
 def astar_path(start, goal, grid):
     rows = len(grid)
@@ -222,6 +222,7 @@ def treasure_minimax(distances, target_names, target_values,
                      depth, start_a=0, start_b=1):
     targets = tuple(range(2, len(target_names)))
 
+    @lru_cache(maxsize=None)
     def search(position_a, position_b, remaining,
                score_a, score_b, maximizing, current_depth):
         if current_depth == depth or not remaining:
