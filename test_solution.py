@@ -6,6 +6,8 @@ from solution import (
     minimax_stats,
     alpha_beta_stats,
     weighted_astar_cost,
+    reverse_tree,
+    compare_alpha_beta_order,
     TreeNode,
     minimax,
     alpha_beta,
@@ -157,6 +159,54 @@ class TestSearchAlgorithms(unittest.TestCase):
         self.assertLessEqual(
             nodes_with_heuristic,
             nodes_without_heuristic,
+        )
+
+    def test_weighted_astar_no_solution(self):
+        grid = [
+            ["S", "X", 1],
+            [1, "X", "E"],
+        ]
+
+        self.assertEqual(
+            weighted_astar_cost((0, 0), (1, 2), grid),
+            -1,
+        )
+
+    def test_reverse_tree(self):
+        root = TreeNode(children=[
+            TreeNode(value=1),
+            TreeNode(value=2),
+        ])
+
+        reversed_root = reverse_tree(root)
+
+        self.assertEqual(
+            reversed_root.children[0].value,
+            2,
+        )
+
+        self.assertEqual(
+            reversed_root.children[1].value,
+            1,
+        )
+
+    def test_alpha_beta_order_comparison(self):
+        root = TreeNode(children=[
+            TreeNode(children=[
+                TreeNode(value=3),
+                TreeNode(value=5),
+            ]),
+            TreeNode(children=[
+                TreeNode(value=1),
+                TreeNode(value=2),
+            ]),
+        ])
+
+        result = compare_alpha_beta_order(root)
+
+        self.assertEqual(
+            result["normal_order"]["value"],
+            result["reversed_order"]["value"],
         )
 
 if __name__ == "__main__":
