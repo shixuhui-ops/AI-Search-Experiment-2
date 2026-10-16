@@ -2,6 +2,9 @@ import unittest
 
 from solution import (
     astar_path,
+    astar_path_stats,
+    minimax_stats,
+    alpha_beta_stats,
     weighted_astar_cost,
     TreeNode,
     minimax,
@@ -119,6 +122,42 @@ class TestSearchAlgorithms(unittest.TestCase):
             {"best_target": "T2", "best_value": -1},
         )
 
+    def test_search_statistics(self):
+        grid = [
+            ["S", ".", ".", "X", "."],
+            [".", "X", ".", ".", "."],
+            [".", "X", ".", "X", "."],
+            [".", ".", ".", "X", "E"],
+            ["X", "X", ".", ".", "."],
+        ]
+
+        path_without_heuristic, nodes_without_heuristic = (
+            astar_path_stats(
+                (0, 0),
+                (3, 4),
+                grid,
+                False,
+            )
+        )
+
+        path_with_heuristic, nodes_with_heuristic = (
+            astar_path_stats(
+                (0, 0),
+                (3, 4),
+                grid,
+                True,
+            )
+        )
+
+        self.assertEqual(
+            path_without_heuristic,
+            path_with_heuristic,
+        )
+
+        self.assertLessEqual(
+            nodes_with_heuristic,
+            nodes_without_heuristic,
+        )
 
 if __name__ == "__main__":
     unittest.main()
