@@ -5,6 +5,7 @@ from solution import (
     TreeNode,
     minimax_stats,
     alpha_beta_stats,
+    reverse_tree,
 )
 
 
@@ -78,3 +79,45 @@ print(measure_tree(minimax_stats))
 
 print("Alpha-Beta：")
 print(measure_tree(alpha_beta_stats))
+
+
+def build_tree(depth, base_value=0):
+    if depth == 0:
+        return TreeNode(value=base_value)
+
+    children = []
+
+    for index in range(3):
+        child = build_tree(
+            depth - 1,
+            base_value * 3 + index
+        )
+        children.append(child)
+
+    return TreeNode(children=children)
+
+
+large_tree = build_tree(4, 1)
+
+normal_value, normal_nodes = alpha_beta_stats(large_tree)
+
+reversed_large_tree = reverse_tree(large_tree)
+reversed_value, reversed_nodes = alpha_beta_stats(
+    reversed_large_tree
+)
+
+print("大规模博弈树：")
+print("原顺序:", {
+    "value": normal_value,
+    "visited_nodes": normal_nodes,
+})
+
+print("反转顺序:", {
+    "value": reversed_value,
+    "visited_nodes": reversed_nodes,
+})
+
+print(
+    "访问节点差异:",
+    reversed_nodes - normal_nodes
+)
