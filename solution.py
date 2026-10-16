@@ -196,16 +196,25 @@ def alpha_beta(node, maximizing_player=True, alpha=float("-inf"),
     return best_value
 
 def treasure_distances(grid, points):
-    distance_matrix = []
+    size = len(points)
 
-    for start in points:
-        row = []
+    distance_matrix = [
+        [-1 for _ in range(size)]
+        for _ in range(size)
+    ]
 
-        for goal in points:
-            distance = weighted_astar_cost(start, goal, grid)
-            row.append(distance)
+    for i in range(size):
+        distance_matrix[i][i] = 0
 
-        distance_matrix.append(row)
+        for j in range(i + 1, size):
+            distance = weighted_astar_cost(
+                points[i],
+                points[j],
+                grid
+            )
+
+            distance_matrix[i][j] = distance
+            distance_matrix[j][i] = distance
 
     return distance_matrix
 
