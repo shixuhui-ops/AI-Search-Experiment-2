@@ -117,16 +117,40 @@ for row in distances:
 print()
 print("题目四：博弈结果")
 print("Minimax H=2:", treasure_minimax(
-    distances, names, values, 2
+    distances, names, values, 2,
+    return_stats=True,
 ))
+
 print("Minimax H=4:", treasure_minimax(
-    distances, names, values, 4
+    distances, names, values, 4,
+    return_stats=True,
 ))
+
 print("Alpha-Beta H=2:", treasure_alpha_beta(
-    distances, names, values, 2
+    distances, names, values, 2,
+    return_stats=True,
 ))
+
 print("Alpha-Beta H=4:", treasure_alpha_beta(
-    distances, names, values, 4
+    distances, names, values, 4,
+    return_stats=True,
+))
+print("排序 Alpha-Beta H=2:", treasure_alpha_beta(
+    distances,
+    names,
+    values,
+    2,
+    return_stats=True,
+    order_moves=True,
+))
+
+print("排序 Alpha-Beta H=4:", treasure_alpha_beta(
+    distances,
+    names,
+    values,
+    4,
+    return_stats=True,
+    order_moves=True,
 ))
 
 print()

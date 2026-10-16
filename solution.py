@@ -7,7 +7,13 @@ def astar_path(start, goal, grid):
 
     def heuristic(position):
         row, col = position
-        return abs(row - goal[0]) + abs(col - goal[1])
+        distance = abs(row - goal[0]) + abs(col - goal[1])
+
+        # 进入 E 的最后一步代价为 0，因此不能计入启发代价。
+        if grid[goal[0]][goal[1]] == "E":
+            distance = max(distance - 1, 0)
+
+        return distance
 
     def neighbors(position):
         row, col = position
@@ -219,20 +225,37 @@ def treasure_distances(grid, points):
     return distance_matrix
 
 def treasure_minimax(distances, target_names, target_values,
-                     depth, start_a=0, start_b=1):
+                     depth, start_a=0, start_b=1,
+                     return_stats=False):
     targets = tuple(range(2, len(target_names)))
+    expanded_states = 0
 
     @lru_cache(maxsize=None)
     def search(position_a, position_b, remaining,
                score_a, score_b, maximizing, current_depth):
+        nonlocal expanded_states
+        expanded_states += 1
         if current_depth == depth or not remaining:
+            return score_a - score_b, None
+
+        current_position = (
+            position_a if maximizing else position_b
+        )
+
+        reachable_targets = tuple(
+            target
+            for target in remaining
+            if distances[current_position][target] >= 0
+        )
+
+        if not reachable_targets:
             return score_a - score_b, None
 
         if maximizing:
             best_value = float("-inf")
             best_target = None
 
-            for target in remaining:
+            for target in reachable_targets:
                 distance = distances[position_a][target]
 
                 if distance < 0:
@@ -261,7 +284,7 @@ def treasure_minimax(distances, target_names, target_values,
 
         best_value = float("inf")
 
-        for target in remaining:
+        for target in reachable_targets:
             distance = distances[position_b][target]
 
             if distance < 0:
@@ -297,27 +320,68 @@ def treasure_minimax(distances, target_names, target_values,
         0
     )
 
-    return {
+    result = {
         "best_target": target,
-        "best_value": value
+        "best_value": value,
     }
 
+    if return_stats:
+        result["expanded_states"] = expanded_states
+
+    return result
+
 def treasure_alpha_beta(distances, target_names, target_values,
-                        depth, start_a=0, start_b=1):
+                        depth, start_a=0, start_b=1,
+                        return_stats=False, order_moves=False):
     targets = tuple(range(2, len(target_names)))
+    expanded_states = 0
 
     def search(position_a, position_b, remaining,
                score_a, score_b, maximizing,
                current_depth, alpha, beta):
-
+        nonlocal expanded_states
+        expanded_states += 1
         if current_depth == depth or not remaining:
             return score_a - score_b, None
+        current_position = (
+            position_a if maximizing else position_b
+        )
 
+        reachable_targets = tuple(
+            target
+            for target in remaining
+            if distances[current_position][target] >= 0
+        )
+
+        if not reachable_targets:
+            return score_a - score_b, None
+
+        ordered_remaining = reachable_targets
+
+        if order_moves:
+            def move_priority(target):
+                distance = distances[current_position][target]
+
+                if distance < 0:
+                    return float("-inf")
+
+                return (
+                    target_values[target_names[target]]
+                    - distance
+                )
+
+            ordered_remaining = tuple(
+                sorted(
+                    reachable_targets,
+                    key=move_priority,
+                    reverse=True,
+                )
+            )
         if maximizing:
             best_value = float("-inf")
             best_target = None
 
-            for target in remaining:
+            for target in ordered_remaining:
                 distance = distances[position_a][target]
 
                 if distance < 0:
@@ -354,7 +418,7 @@ def treasure_alpha_beta(distances, target_names, target_values,
 
         best_value = float("inf")
 
-        for target in remaining:
+        for target in ordered_remaining:
             distance = distances[position_b][target]
 
             if distance < 0:
@@ -398,10 +462,15 @@ def treasure_alpha_beta(distances, target_names, target_values,
         float("inf")
     )
 
-    return {
+    result = {
         "best_target": target,
-        "best_value": value
+        "best_value": value,
     }
+
+    if return_stats:
+        result["expanded_states"] = expanded_states
+
+    return result
 
 def astar_path_stats(start, goal, grid, use_heuristic=True):
     rows = len(grid)

@@ -13,6 +13,7 @@ from solution import (
     alpha_beta,
     treasure_minimax,
     treasure_alpha_beta,
+    treasure_distances,
 )
 
 
@@ -122,6 +123,155 @@ class TestSearchAlgorithms(unittest.TestCase):
         self.assertEqual(
             alpha_beta_result,
             {"best_target": "T2", "best_value": -1},
+        )
+        minimax_result_h4 = treasure_minimax(
+            distances,
+            names,
+            values,
+            4,
+        )
+
+        alpha_beta_result_h4 = treasure_alpha_beta(
+            distances,
+            names,
+            values,
+            4,
+        )
+
+        self.assertEqual(
+            minimax_result_h4,
+            {"best_target": "T3", "best_value": 3},
+        )
+
+        self.assertEqual(
+            alpha_beta_result_h4,
+            {"best_target": "T3", "best_value": 3},
+        )
+        minimax_h4_stats = treasure_minimax(
+            distances,
+            names,
+            values,
+            4,
+            return_stats=True,
+        )
+
+        alpha_beta_h4_stats = treasure_alpha_beta(
+            distances,
+            names,
+            values,
+            4,
+            return_stats=True,
+        )
+
+        self.assertEqual(
+            minimax_h4_stats["expanded_states"],
+            65,
+        )
+
+        self.assertEqual(
+            alpha_beta_h4_stats["expanded_states"],
+            49,
+        )
+
+        self.assertLess(
+            alpha_beta_h4_stats["expanded_states"],
+            minimax_h4_stats["expanded_states"],
+        )
+        ordered_alpha_beta_h4 = treasure_alpha_beta(
+            distances,
+            names,
+            values,
+            4,
+            return_stats=True,
+            order_moves=True,
+        )
+
+        self.assertEqual(
+            ordered_alpha_beta_h4["best_target"],
+            "T3",
+        )
+
+        self.assertEqual(
+            ordered_alpha_beta_h4["best_value"],
+            3,
+        )
+
+        self.assertEqual(
+            ordered_alpha_beta_h4["expanded_states"],
+            39,
+        )
+
+        self.assertLess(
+            ordered_alpha_beta_h4["expanded_states"],
+            alpha_beta_h4_stats["expanded_states"],
+        )
+
+    def test_treasure_distance_matrix(self):
+        grid = [
+            ["A", 1, 1, "X", 2, 1, "T1"],
+            [1, "X", 6, "X", 1, "X", 1],
+            [1, 1, "T2", 1, 1, 1, 1],
+            ["X", 1, "X", 8, "X", 1, "X"],
+            [1, 1, 1, 1, "T3", 1, 1],
+            [1, "X", 9, "X", 1, "X", 1],
+            ["T4", 1, 1, "X", 1, 1, "B"],
+        ]
+
+        points = [
+            (0, 0),
+            (6, 6),
+            (0, 6),
+            (2, 2),
+            (4, 4),
+            (6, 0),
+        ]
+
+        expected = [
+            [0, 12, 10, 4, 8, 8],
+            [12, 0, 8, 8, 4, 10],
+            [10, 8, 0, 6, 6, 12],
+            [4, 8, 6, 0, 6, 6],
+            [8, 4, 6, 6, 0, 6],
+            [8, 10, 12, 6, 6, 0],
+        ]
+
+        self.assertEqual(
+            treasure_distances(grid, points),
+            expected,
+        )
+    def test_unreachable_treasure(self):
+        distances = [
+            [0, 0, -1],
+            [0, 0, -1],
+            [-1, -1, 0],
+        ]
+
+        names = ["A", "B", "T1"]
+        values = {"T1": 9}
+
+        expected = {
+            "best_target": None,
+            "best_value": 0,
+        }
+
+        self.assertEqual(
+            treasure_minimax(
+                distances,
+                names,
+                values,
+                1,
+            ),
+            expected,
+        )
+
+        self.assertEqual(
+            treasure_alpha_beta(
+                distances,
+                names,
+                values,
+                1,
+            ),
+            expected,
         )
 
     def test_search_statistics(self):

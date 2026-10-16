@@ -6,6 +6,7 @@ from solution import (
     minimax_stats,
     alpha_beta_stats,
     reverse_tree,
+    treasure_alpha_beta,
 )
 
 
@@ -37,22 +38,34 @@ def measure_astar(use_heuristic):
     }
 
 
-left = TreeNode(children=[
+max1 = TreeNode(children=[
     TreeNode(value=3),
     TreeNode(value=5),
 ])
 
-right = TreeNode(children=[
+max2 = TreeNode(children=[
     TreeNode(value=6),
     TreeNode(value=9),
 ])
 
+max3 = TreeNode(children=[
+    TreeNode(value=1),
+    TreeNode(value=2),
+])
+
+min1 = TreeNode(children=[
+    max1,
+    max2,
+])
+
+min2 = TreeNode(children=[
+    max2,
+    max3,
+])
+
 root = TreeNode(children=[
-    TreeNode(children=[left, right]),
-    TreeNode(children=[
-        TreeNode(value=1),
-        TreeNode(value=2),
-    ]),
+    min1,
+    min2,
 ])
 
 
@@ -121,3 +134,45 @@ print(
     "访问节点差异:",
     reversed_nodes - normal_nodes
 )
+
+print()
+print("综合题 Alpha-Beta 节点排序：")
+
+treasure_distance_matrix = [
+    [0, 12, 10, 4, 8, 8],
+    [12, 0, 8, 8, 4, 10],
+    [10, 8, 0, 6, 6, 12],
+    [4, 8, 6, 0, 6, 6],
+    [8, 4, 6, 6, 0, 6],
+    [8, 10, 12, 6, 6, 0],
+]
+
+treasure_names = ["A", "B", "T1", "T2", "T3", "T4"]
+
+treasure_values = {
+    "T1": 9,
+    "T2": 7,
+    "T3": 8,
+    "T4": 7,
+}
+
+for search_depth in (2, 4):
+    original = treasure_alpha_beta(
+        treasure_distance_matrix,
+        treasure_names,
+        treasure_values,
+        search_depth,
+        return_stats=True,
+    )
+
+    ordered = treasure_alpha_beta(
+        treasure_distance_matrix,
+        treasure_names,
+        treasure_values,
+        search_depth,
+        return_stats=True,
+        order_moves=True,
+    )
+
+    print(f"H={search_depth} 原始顺序:", original)
+    print(f"H={search_depth} 启发式排序:", ordered)
