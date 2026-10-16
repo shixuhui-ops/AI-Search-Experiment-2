@@ -302,3 +302,15 @@ Alpha-Beta 减少访问：
     python -m py_compile solution.py run_experiment.py test_solution.py
     python -m unittest test_solution.py -v
     python run_experiment.py
+
+## 当前验证结果
+
+自动化测试共 6 个，全部通过。
+
+A* 使用曼哈顿启发函数后，扩展节点数从 16 个减少为 14 个。
+
+在大规模博弈树上，Alpha-Beta 通过优化访问顺序将访问节点数从 73 个减少为 45 个。
+
+宝藏 Minimax 使用记忆化搜索，减少了重复状态的计算。
+
+距离矩阵计算利用无向地图的对称性，只计算上三角部分，再镜像填充下三角。
