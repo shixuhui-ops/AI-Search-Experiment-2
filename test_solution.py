@@ -273,7 +273,39 @@ class TestSearchAlgorithms(unittest.TestCase):
             ),
             expected,
         )
+    def test_minimax_cache(self):
+        size = 8
+        distances = [
+            [0] * size
+            for _ in range(size)
+        ]
+        names = [
+            "A",
+            "B",
+            "T1",
+            "T2",
+            "T3",
+            "T4",
+            "T5",
+            "T6",
+        ]
+        values = {
+            name: 1
+            for name in names[2:]
+        }
 
+        result = treasure_minimax(
+            distances,
+            names,
+            values,
+            6,
+            return_stats=True,
+        )
+
+        self.assertEqual(result["best_value"], 0)
+        self.assertEqual(result["expanded_states"], 487)
+        self.assertEqual(result["cache_hits"], 510)
+        self.assertGreater(result["cache_hits"], 0)
     def test_search_statistics(self):
         grid = [
             ["S", ".", ".", "X", "."],

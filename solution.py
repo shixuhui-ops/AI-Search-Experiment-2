@@ -326,7 +326,11 @@ def treasure_minimax(distances, target_names, target_values,
     }
 
     if return_stats:
+        cache_info = search.cache_info()
+
         result["expanded_states"] = expanded_states
+        result["cache_hits"] = cache_info.hits
+        result["cache_misses"] = cache_info.misses
 
     return result
 

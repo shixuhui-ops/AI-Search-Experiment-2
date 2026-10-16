@@ -1,4 +1,5 @@
 import time
+from math import factorial
 
 from solution import (
     astar_path_stats,
@@ -7,6 +8,7 @@ from solution import (
     alpha_beta_stats,
     reverse_tree,
     treasure_alpha_beta,
+    treasure_minimax,
 )
 
 
@@ -176,3 +178,50 @@ for search_depth in (2, 4):
 
     print(f"H={search_depth} 原始顺序:", original)
     print(f"H={search_depth} 启发式排序:", ordered)
+
+print()
+print("Minimax 记忆化对照：")
+
+symmetric_size = 8
+symmetric_distances = [
+    [0] * symmetric_size
+    for _ in range(symmetric_size)
+]
+symmetric_names = [
+    "A",
+    "B",
+    "T1",
+    "T2",
+    "T3",
+    "T4",
+    "T5",
+    "T6",
+]
+symmetric_values = {
+    name: 1
+    for name in symmetric_names[2:]
+}
+
+uncached_states = sum(
+    factorial(6) // factorial(6 - depth)
+    for depth in range(7)
+)
+
+cached_result = treasure_minimax(
+    symmetric_distances,
+    symmetric_names,
+    symmetric_values,
+    6,
+    return_stats=True,
+)
+
+reduction = (
+    (uncached_states - cached_result["expanded_states"])
+    / uncached_states
+    * 100
+)
+
+print("无缓存理论节点数:", uncached_states)
+print("缓存展开状态数:", cached_result["expanded_states"])
+print("缓存命中次数:", cached_result["cache_hits"])
+print(f"状态减少比例: {reduction:.1f}%")

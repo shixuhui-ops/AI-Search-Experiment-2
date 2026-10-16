@@ -31,7 +31,7 @@ https://github.com/shixuhui-ops/AI-Search-Experiment-2
         运行题目给定样例并输出全部实验结果。
 
     test_solution.py
-        自动化测试文件，共 11 个测试用例。
+        自动化测试文件，共 12 个测试用例。
 
     benchmark.py
         测量运行时间、搜索节点数量和 Alpha-Beta 访问顺序影响。
@@ -266,6 +266,8 @@ Alpha-Beta 减少访问：
 
 宝藏 Minimax 使用 `lru_cache` 缓存已经计算过的状态，避免重复计算相同的玩家位置、剩余宝藏、累计得分和当前回合。
 
+在包含 6 个等价值宝藏的对称场景中，完整搜索树理论上包含 1957 个节点。使用 `lru_cache` 后只展开 487 个不同状态，产生 510 次缓存命中，状态展开减少 75.1%。该对照可通过 `python benchmark.py` 复现。
+
 ### 4. Alpha-Beta 剪枝
 
 Alpha-Beta 使用 `alpha` 和 `beta` 两个边界排除不可能影响最终结果的分支。
@@ -305,13 +307,14 @@ Alpha-Beta 使用 `alpha` 和 `beta` 两个边界排除不可能影响最终结�
 
     python -m unittest test_solution.py -v
 
-当前共有 11 个测试用例，覆盖：
+当前共有 12 个测试用例，覆盖：
 
 - 迷宫 A* 路径搜索
 - 迷宫无解情况
 - 加权地形 A*
 - 加权地图无解情况
 - Minimax 与 Alpha-Beta 正确性
+- Minimax 记忆化缓存效果
 - 宝藏博弈 H=2、H=4 与节点排序
 - 6×6 宝藏距离矩阵
 - 宝藏全部不可达情况
@@ -321,7 +324,7 @@ Alpha-Beta 使用 `alpha` 和 `beta` 两个边界排除不可能影响最终结�
 
 预期结果：
 
-    Ran 11 tests
+    Ran 12 tests
     OK
 
 ## 测试覆盖率
@@ -334,7 +337,7 @@ Alpha-Beta 使用 `alpha` 和 `beta` 两个边界排除不可能影响最终结�
 当前测试结果：
 
     solution.py 覆盖率为 91%
-    项目整体覆盖率为 92%
+    项目整体覆盖率为 93%
 
 剩余未覆盖部分主要是演示入口、异常分支和少量不影响核心算法正确性的代码。
 
@@ -373,7 +376,7 @@ Alpha-Beta 使用 `alpha` 和 `beta` 两个边界排除不可能影响最终结�
 该脚本依次执行：
 
 1. Python 文件语法检查
-2. 11 个自动化测试
+2. 12 个自动化测试
 3. 完整实验运行
 4. 输出验证通过提示
 
@@ -412,7 +415,7 @@ Alpha-Beta 使用 `alpha` 和 `beta` 两个边界排除不可能影响最终结�
 
 - Python 语法检查
 - 依赖安装
-- 11 个单元测试
+- 12 个单元测试
 - coverage 覆盖率统计
 - 覆盖率报告保存
 

@@ -22,8 +22,8 @@ Alpha-Beta访问节点数: 14
 [8, 10, 12, 6, 6, 0]
 
 题目四：博弈结果
-Minimax H=2: {'best_target': 'T2', 'best_value': -1, 'expanded_states': 17}
-Minimax H=4: {'best_target': 'T3', 'best_value': 3, 'expanded_states': 65}
+Minimax H=2: {'best_target': 'T2', 'best_value': -1, 'expanded_states': 17, 'cache_hits': 0, 'cache_misses': 17}
+Minimax H=4: {'best_target': 'T3', 'best_value': 3, 'expanded_states': 65, 'cache_hits': 0, 'cache_misses': 65}
 Alpha-Beta H=2: {'best_target': 'T2', 'best_value': -1, 'expanded_states': 13}
 Alpha-Beta H=4: {'best_target': 'T3', 'best_value': 3, 'expanded_states': 49}
 排序 Alpha-Beta H=2: {'best_target': 'T2', 'best_value': -1, 'expanded_states': 11}
