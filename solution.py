@@ -393,6 +393,68 @@ def treasure_alpha_beta(distances, target_names, target_values,
         "best_value": value
     }
 
+def astar_path_stats(start, goal, grid, use_heuristic=True):
+    rows = len(grid)
+    cols = len(grid[0])
+
+    def heuristic(position):
+        if not use_heuristic:
+            return 0
+
+        return abs(position[0] - goal[0]) + abs(position[1] - goal[1])
+
+    def neighbors(position):
+        row, col = position
+
+        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            new_row = row + dr
+            new_col = col + dc
+
+            if 0 <= new_row < rows and 0 <= new_col < cols:
+                if grid[new_row][new_col] != "X":
+                    yield (new_row, new_col)
+
+    open_list = []
+    heapq.heappush(open_list, (heuristic(start), 0, start))
+
+    g_cost = {start: 0}
+    parent = {}
+    expanded_nodes = 0
+
+    while open_list:
+        _, current_cost, current = heapq.heappop(open_list)
+
+        if current_cost != g_cost.get(current):
+            continue
+
+        expanded_nodes += 1
+
+        if current == goal:
+            path = [current]
+
+            while current != start:
+                current = parent[current]
+                path.append(current)
+
+            path.reverse()
+            return path, expanded_nodes
+
+        for next_position in neighbors(current):
+            new_cost = current_cost + 1
+
+            if new_cost < g_cost.get(next_position, float("inf")):
+                g_cost[next_position] = new_cost
+                parent[next_position] = current
+
+                f_cost = new_cost + heuristic(next_position)
+
+                heapq.heappush(
+                    open_list,
+                    (f_cost, new_cost, next_position)
+                )
+
+    return [], expanded_nodes
+
 if __name__ == "__main__":
     start = (0, 0)
     goal = (3, 4)

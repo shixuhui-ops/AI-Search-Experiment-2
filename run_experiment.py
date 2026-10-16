@@ -1,5 +1,6 @@
 from solution import (
     astar_path,
+    astar_path_stats,
     weighted_astar_cost,
     TreeNode,
     minimax,
@@ -76,6 +77,15 @@ values = {
 
 print("题目一：迷宫 A*")
 print(astar_path((0, 0), (3, 4), maze))
+print(
+    "h=0 节点数:",
+    astar_path_stats((0, 0), (3, 4), maze, False)[1]
+)
+
+print(
+    "曼哈顿启发式节点数:",
+    astar_path_stats((0, 0), (3, 4), maze, True)[1]
+)
 
 print()
 print("题目二：加权地形 A*")
