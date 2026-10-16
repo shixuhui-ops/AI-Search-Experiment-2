@@ -1,6 +1,8 @@
 from solution import (
     astar_path,
     astar_path_stats,
+    minimax_stats,
+    alpha_beta_stats,
     weighted_astar_cost,
     TreeNode,
     minimax,
@@ -95,6 +97,15 @@ print()
 print("题目三：Minimax 与 Alpha-Beta")
 print("Minimax:", minimax(root))
 print("Alpha-Beta:", alpha_beta(root))
+minimax_value, minimax_nodes = minimax_stats(root)
+alpha_beta_value, alpha_beta_nodes = alpha_beta_stats(root)
+
+print("Minimax访问节点数:", minimax_nodes)
+print("Alpha-Beta访问节点数:", alpha_beta_nodes)
+print(
+    "剪枝节点数:",
+    minimax_nodes - alpha_beta_nodes
+)
 
 print()
 print("题目四：距离矩阵")

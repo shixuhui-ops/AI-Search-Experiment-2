@@ -455,6 +455,76 @@ def astar_path_stats(start, goal, grid, use_heuristic=True):
 
     return [], expanded_nodes
 
+def minimax_stats(node, maximizing_player=True):
+    visited_nodes = 1
+
+    if not node.children:
+        return node.value, visited_nodes
+
+    values = []
+
+    for child in node.children:
+        value, child_count = minimax_stats(
+            child,
+            not maximizing_player
+        )
+
+        values.append(value)
+        visited_nodes += child_count
+
+    if maximizing_player:
+        return max(values), visited_nodes
+
+    return min(values), visited_nodes
+
+
+def alpha_beta_stats(node, maximizing_player=True,
+                     alpha=float("-inf"),
+                     beta=float("inf")):
+    visited_nodes = 1
+
+    if not node.children:
+        return node.value, visited_nodes
+
+    if maximizing_player:
+        best_value = float("-inf")
+
+        for child in node.children:
+            value, child_count = alpha_beta_stats(
+                child,
+                False,
+                alpha,
+                beta
+            )
+
+            visited_nodes += child_count
+            best_value = max(best_value, value)
+            alpha = max(alpha, best_value)
+
+            if alpha >= beta:
+                break
+
+        return best_value, visited_nodes
+
+    best_value = float("inf")
+
+    for child in node.children:
+        value, child_count = alpha_beta_stats(
+            child,
+            True,
+            alpha,
+            beta
+        )
+
+        visited_nodes += child_count
+        best_value = min(best_value, value)
+        beta = min(beta, best_value)
+
+        if alpha >= beta:
+            break
+
+    return best_value, visited_nodes
+
 if __name__ == "__main__":
     start = (0, 0)
     goal = (3, 4)
