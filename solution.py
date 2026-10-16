@@ -525,6 +525,38 @@ def alpha_beta_stats(node, maximizing_player=True,
 
     return best_value, visited_nodes
 
+def reverse_tree(node):
+    if not node.children:
+        return TreeNode(value=node.value)
+
+    reversed_children = [
+        reverse_tree(child)
+        for child in reversed(node.children)
+    ]
+
+    return TreeNode(children=reversed_children)
+
+
+def compare_alpha_beta_order(root):
+    normal_value, normal_nodes = alpha_beta_stats(root)
+
+    reversed_root = reverse_tree(root)
+    reversed_value, reversed_nodes = alpha_beta_stats(reversed_root)
+
+    return {
+        "normal_order": {
+            "value": normal_value,
+            "visited_nodes": normal_nodes,
+        },
+        "reversed_order": {
+            "value": reversed_value,
+            "visited_nodes": reversed_nodes,
+        },
+        "extra_nodes_after_reversing": (
+            reversed_nodes - normal_nodes
+        ),
+    }
+
 if __name__ == "__main__":
     start = (0, 0)
     goal = (3, 4)
