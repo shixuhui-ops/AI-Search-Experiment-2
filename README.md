@@ -15,8 +15,12 @@ https://github.com/shixuhui-ops/AI-Search-Experiment-2
 - 竞争环境下的宝藏分配博弈
 - A* 启发函数性能对比
 - Minimax 与 Alpha-Beta 节点访问数量对比
+- Alpha-Beta 子节点访问顺序对比
+- Minimax 记忆化搜索
+- 距离矩阵对称性优化
 - 无解情况和边界情况测试
 - Python unittest 自动化测试
+- GitHub Actions 自动测试和覆盖率统计
 
 ## 文件说明
 
@@ -24,13 +28,25 @@ https://github.com/shixuhui-ops/AI-Search-Experiment-2
         所有核心算法实现。
 
     run_experiment.py
-        运行实验样例并输出全部实验结果。
+        运行题目给定样例并输出全部实验结果。
 
     test_solution.py
-        自动化测试文件。
+        自动化测试文件，共 9 个测试用例。
+
+    benchmark.py
+        测量运行时间、搜索节点数量和 Alpha-Beta 访问顺序影响。
 
     make_report.py
         根据实验报告 Markdown 文件生成 PDF。
+
+    make_pdf.py
+        将实验报告 Markdown 转换为 PDF。
+
+    verify.ps1
+        一键执行语法检查、自动化测试和完整实验。
+
+    requirements.txt
+        项目依赖文件。
 
     实验报告.md
         实验报告源文件。
@@ -41,21 +57,22 @@ https://github.com/shixuhui-ops/AI-Search-Experiment-2
     experiment_results.txt
         实验运行结果记录。
 
-    make_pdf.py
-        PDF 报告生成脚本。
-
     实验二提交.zip
         最终提交压缩包。
+
+    .github/workflows/tests.yml
+        GitHub Actions 自动测试和覆盖率工作流。
 
 ## 环境要求
 
     Python 3.8 或更高版本
     reportlab
     pypdf
+    coverage
 
-安装 PDF 生成依赖：
+安装全部依赖：
 
-    python -m pip install reportlab pypdf
+    python -m pip install -r requirements.txt
 
 ## 题目一：迷宫 A*
 
@@ -221,6 +238,38 @@ Alpha-Beta 减少访问：
 
 在更深、更宽的博弈树中，Alpha-Beta 剪枝的效果会更加明显。
 
+### 大规模博弈树
+
+在深度为 4、每个节点有 3 个子节点的博弈树上：
+
+    原始访问顺序：访问 73 个节点
+    反转访问顺序：访问 45 个节点
+    最优值：141
+
+两种访问顺序得到相同的最优值，但反转顺序少访问 28 个节点，说明 Alpha-Beta 的剪枝效率与子节点访问顺序密切相关。
+
+## 优化策略
+
+### 1. 启发函数
+
+普通迷宫使用曼哈顿距离作为启发函数：
+
+    h(n) = |row - goal_row| + |col - goal_col|
+
+四方向移动时，曼哈顿距离不会高估真实剩余步数，因此具有可采纳性。
+
+### 2. 距离矩阵对称性
+
+地图移动代价具有对称性，因此距离矩阵只计算上三角部分，再将结果镜像填充到下三角，避免重复执行 A*。
+
+### 3. Minimax 记忆化
+
+宝藏 Minimax 使用 `lru_cache` 缓存已经计算过的状态，避免重复计算相同的玩家位置、剩余宝藏、累计得分和当前回合。
+
+### 4. Alpha-Beta 剪枝
+
+Alpha-Beta 使用 `alpha` 和 `beta` 两个边界排除不可能影响最终结果的分支。
+
 ## 边界情况
 
 迷宫无解时：
@@ -241,9 +290,62 @@ Alpha-Beta 减少访问：
 
 程序能够正确处理无解地图，不会进入死循环，也不会返回非法路径。
 
-## 运行实验
+## 自动化测试
 
-执行完整实验：
+运行全部测试：
+
+    python -m unittest test_solution.py -v
+
+当前共有 9 个测试用例，覆盖：
+
+- 迷宫 A* 路径搜索
+- 迷宫无解情况
+- 加权地形 A*
+- 加权地图无解情况
+- Minimax
+- Alpha-Beta
+- A* 性能统计
+- 二叉树反转
+- Alpha-Beta 访问顺序
+
+预期结果：
+
+    Ran 9 tests
+    OK
+
+## 测试覆盖率
+
+执行：
+
+    python -m coverage run -m unittest test_solution.py
+    python -m coverage report -m
+
+当前测试结果：
+
+    solution.py 覆盖率约为 87%
+    项目整体覆盖率约为 88%
+
+剩余未覆盖部分主要是演示入口、异常分支和少量不影响核心算法正确性的代码。
+
+## 运行时间基准测试
+
+执行：
+
+    python benchmark.py
+
+基准测试包含：
+
+- A* 使用 `h=0` 时的运行时间和节点数量
+- A* 使用曼哈顿距离时的运行时间和节点数量
+- Minimax 的运行时间和访问节点数
+- Alpha-Beta 的运行时间和访问节点数
+- 大规模博弈树的访问顺序对比
+
+由于测试规模较小，运行时间会受到系统调度和计时精度影响，因此主要使用节点访问数量评价算法效率。
+
+## 运行完整实验
+
+执行：
 
     python run_experiment.py
 
@@ -251,25 +353,18 @@ Alpha-Beta 减少访问：
 
     python run_experiment.py | Tee-Object experiment_results.txt
 
-## 自动化测试
+## 一键验证
 
-运行全部测试：
+执行：
 
-    python -m unittest test_solution.py -v
+    powershell -ExecutionPolicy Bypass -File .\verify.ps1
 
-当前测试覆盖：
+该脚本依次执行：
 
-- 迷宫 A* 路径搜索
-- 迷宫无解情况
-- 加权地形 A*
-- Minimax
-- Alpha-Beta
-- 宝藏博弈
-
-预期结果：
-
-    Ran 5 tests
-    OK
+1. Python 文件语法检查
+2. 9 个自动化测试
+3. 完整实验运行
+4. 输出验证通过提示
 
 ## 生成实验报告 PDF
 
@@ -285,32 +380,50 @@ Alpha-Beta 减少访问：
 
 ## 生成提交压缩包
 
-    Compress-Archive -Path solution.py,run_experiment.py,test_solution.py,make_report.py,实验报告.md,实验报告.pdf,experiment_results.txt -DestinationPath 实验二提交.zip -Force
+    Compress-Archive -Path solution.py,run_experiment.py,test_solution.py,benchmark.py,make_report.py,make_pdf.py,verify.ps1,实验报告.md,实验报告.pdf,experiment_results.txt -DestinationPath 实验二提交.zip -Force
 
 最终压缩包包括：
 
     solution.py
     run_experiment.py
     test_solution.py
+    benchmark.py
     make_report.py
+    make_pdf.py
+    verify.ps1
     实验报告.md
     实验报告.pdf
     experiment_results.txt
 
+## GitHub Actions
+
+项目使用 GitHub Actions 自动执行：
+
+- Python 语法检查
+- 依赖安装
+- 9 个单元测试
+- coverage 覆盖率统计
+- 覆盖率报告保存
+
+工作流文件：
+
+    .github/workflows/tests.yml
+
+每次向 GitHub 推送代码或创建 Pull Request 时，工作流都会自动运行。
+
 ## 最终验证
 
-    python -m py_compile solution.py run_experiment.py test_solution.py
+    python -m py_compile solution.py
+    python -m py_compile run_experiment.py
+    python -m py_compile test_solution.py
+    python -m py_compile benchmark.py
+    python -m py_compile make_report.py
+    python -m py_compile make_pdf.py
+
     python -m unittest test_solution.py -v
+
+    python -m coverage run -m unittest test_solution.py
+    python -m coverage report -m
+
     python run_experiment.py
-
-## 当前验证结果
-
-自动化测试共 6 个，全部通过。
-
-A* 使用曼哈顿启发函数后，扩展节点数从 16 个减少为 14 个。
-
-在大规模博弈树上，Alpha-Beta 通过优化访问顺序将访问节点数从 73 个减少为 45 个。
-
-宝藏 Minimax 使用记忆化搜索，减少了重复状态的计算。
-
-距离矩阵计算利用无向地图的对称性，只计算上三角部分，再镜像填充下三角。
+    python benchmark.py
