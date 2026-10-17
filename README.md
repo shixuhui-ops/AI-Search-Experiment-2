@@ -307,7 +307,7 @@ Alpha-Beta 使用 `alpha` 和 `beta` 两个边界排除不可能影响最终结�
 
     python -m unittest test_solution.py -v
 
-当前共有 13 个测试用例，覆盖：
+当前共有 14 个测试用例，覆盖：
 
 - 迷宫 A* 路径搜索
 - 迷宫无解情况
@@ -338,7 +338,7 @@ Alpha-Beta 使用 `alpha` 和 `beta` 两个边界排除不可能影响最终结�
 当前测试结果：
 
     solution.py 覆盖率为 92%
-    项目整体覆盖率为 93%
+    项目整体覆盖率为 94%
 
 剩余未覆盖部分主要是演示入口、异常分支和少量不影响核心算法正确性的代码。
 
@@ -395,7 +395,7 @@ Alpha-Beta 使用 `alpha` 和 `beta` 两个边界排除不可能影响最终结�
 
 ## 生成提交压缩包
 
-    Compress-Archive -Path solution.py,run_experiment.py,test_solution.py,benchmark.py,make_report.py,make_pdf.py,verify.ps1,实验报告.md,实验报告.pdf,experiment_results.txt -DestinationPath 实验二提交.zip -Force
+    Compress-Archive -Path solution.py,run_experiment.py,test_solution.py,benchmark.py,make_report.py,make_pdf.py,verify.ps1,README.md,requirements.txt,实验报告.md,实验报告.pdf,experiment_results.txt -DestinationPath 实验二提交.zip -Force
 
 最终压缩包包括：
 
