@@ -33,6 +33,15 @@ class TestSearchAlgorithms(unittest.TestCase):
         self.assertEqual(path[0], (0, 0))
         self.assertEqual(path[-1], (3, 4))
         self.assertEqual(len(path), 8)
+        for current, next_position in zip(path, path[1:]):
+            row_difference = abs(current[0] - next_position[0])
+            column_difference = abs(current[1] - next_position[1])
+
+            self.assertEqual(row_difference + column_difference, 1)
+            self.assertNotEqual(
+                grid[next_position[0]][next_position[1]],
+                "X",
+            )
 
     def test_astar_no_solution(self):
         grid = [

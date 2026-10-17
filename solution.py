@@ -25,13 +25,7 @@ def astar_path(start, goal, grid):
 
     def heuristic(position):
         row, col = position
-        distance = abs(row - goal[0]) + abs(col - goal[1])
-
-        # 进入 E 的最后一步代价为 0，因此不能计入启发代价。
-        if grid[goal[0]][goal[1]] == "E":
-            distance = max(distance - 1, 0)
-
-        return distance
+        return abs(row - goal[0]) + abs(col - goal[1])
 
     def neighbors(position):
         row, col = position
@@ -435,12 +429,13 @@ def treasure_alpha_beta(distances, target_names, target_values,
                 )
 
             ordered_remaining = tuple(
-    sorted(
-        reachable_targets,
-        key=move_priority,
-        reverse=True,
-    )
-)
+                sorted(
+                    reachable_targets,
+                    key=move_priority,
+                    reverse=True,
+                )
+            )
+
         if maximizing:
             best_value = float("-inf")
             best_target = None
