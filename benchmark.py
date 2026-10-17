@@ -1,5 +1,6 @@
 import time
 from math import factorial
+from statistics import mean, pstdev
 
 from solution import (
     astar_path_stats,
@@ -21,22 +22,31 @@ maze = [
 ]
 
 
-def measure_astar(use_heuristic):
-    start_time = time.perf_counter()
+def measure_astar(use_heuristic, repeat=30):
+    elapsed_times = []
+    path = None
+    expanded_nodes = None
 
-    path, expanded_nodes = astar_path_stats(
-        (0, 0),
-        (3, 4),
-        maze,
-        use_heuristic,
-    )
+    for _ in range(repeat):
+        start_time = time.perf_counter()
 
-    elapsed = time.perf_counter() - start_time
+        path, expanded_nodes = astar_path_stats(
+            (0, 0),
+            (3, 4),
+            maze,
+            use_heuristic,
+        )
+
+        elapsed_times.append(
+            (time.perf_counter() - start_time) * 1000
+        )
 
     return {
         "path_length": len(path),
         "expanded_nodes": expanded_nodes,
-        "time_ms": elapsed * 1000,
+        "time_mean_ms": mean(elapsed_times),
+        "time_std_ms": pstdev(elapsed_times),
+        "repetitions": repeat,
     }
 
 
@@ -71,15 +81,26 @@ root = TreeNode(children=[
 ])
 
 
-def measure_tree(search_function):
-    start_time = time.perf_counter()
-    value, visited_nodes = search_function(root)
-    elapsed = time.perf_counter() - start_time
+def measure_tree(search_function, repeat=30):
+    elapsed_times = []
+    value = None
+    visited_nodes = None
+
+    for _ in range(repeat):
+        start_time = time.perf_counter()
+
+        value, visited_nodes = search_function(root)
+
+        elapsed_times.append(
+            (time.perf_counter() - start_time) * 1000
+        )
 
     return {
         "value": value,
         "visited_nodes": visited_nodes,
-        "time_ms": elapsed * 1000,
+        "time_mean_ms": mean(elapsed_times),
+        "time_std_ms": pstdev(elapsed_times),
+        "repetitions": repeat,
     }
 
 
@@ -105,7 +126,7 @@ def build_tree(depth, base_value=0):
     for index in range(3):
         child = build_tree(
             depth - 1,
-            base_value * 3 + index
+            base_value * 3 + index,
         )
         children.append(child)
 
@@ -134,7 +155,7 @@ print("反转顺序:", {
 
 print(
     "访问节点差异:",
-    reversed_nodes - normal_nodes
+    reversed_nodes - normal_nodes,
 )
 
 print()
@@ -179,14 +200,17 @@ for search_depth in (2, 4):
     print(f"H={search_depth} 原始顺序:", original)
     print(f"H={search_depth} 启发式排序:", ordered)
 
+
 print()
 print("Minimax 记忆化对照：")
 
 symmetric_size = 8
+
 symmetric_distances = [
     [0] * symmetric_size
     for _ in range(symmetric_size)
 ]
+
 symmetric_names = [
     "A",
     "B",
@@ -197,6 +221,7 @@ symmetric_names = [
     "T5",
     "T6",
 ]
+
 symmetric_values = {
     name: 1
     for name in symmetric_names[2:]
