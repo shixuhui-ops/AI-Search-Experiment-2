@@ -2,8 +2,26 @@ import heapq
 from functools import lru_cache
 
 def astar_path(start, goal, grid):
+    if not grid or not grid[0]:
+        return []
+
+    if any(len(row) != len(grid[0]) for row in grid):
+        return []
+
     rows = len(grid)
     cols = len(grid[0])
+
+    if (
+        not isinstance(start, (tuple, list))
+        or not isinstance(goal, (tuple, list))
+        or len(start) != 2
+        or len(goal) != 2
+        or not all(isinstance(value, int) for value in start)
+        or not all(isinstance(value, int) for value in goal)
+        or not (0 <= start[0] < rows and 0 <= start[1] < cols)
+        or not (0 <= goal[0] < rows and 0 <= goal[1] < cols)
+    ):
+        return []
 
     def heuristic(position):
         row, col = position
@@ -70,9 +88,28 @@ def astar_path(start, goal, grid):
     return []
 
 def weighted_astar_cost(start, goal, grid):
+    if not grid or not grid[0]:
+        return -1
+
+    if any(len(row) != len(grid[0]) for row in grid):
+        return -1
+
     rows = len(grid)
     cols = len(grid[0])
 
+    if (
+        not isinstance(start, (tuple, list))
+        or not isinstance(goal, (tuple, list))
+        or len(start) != 2
+        or len(goal) != 2
+        or not all(isinstance(value, int) for value in start)
+        or not all(isinstance(value, int) for value in goal)
+        or not (0 <= start[0] < rows and 0 <= start[1] < cols)
+        or not (0 <= goal[0] < rows and 0 <= goal[1] < cols)
+    ):
+        return -1
+
+    @lru_cache(maxsize=None)
     def get_cost(position):
         row, col = position
         value = grid[row][col]
@@ -86,11 +123,34 @@ def weighted_astar_cost(start, goal, grid):
         if value in ("S", "A", "B") or str(value).startswith("T"):
             return 1
 
-        return int(value)
+        try:
+            cost = int(value)
+        except (TypeError, ValueError):
+            return None
+
+        if cost < 0:
+            return None
+
+        return cost
+
+    step_costs = [
+        get_cost((row, col))
+        for row in range(rows)
+        for col in range(cols)
+        if get_cost((row, col)) is not None
+        and (row, col) != goal
+    ]
+
+    minimum_step_cost = min(step_costs, default=0)
 
     def heuristic(position):
         row, col = position
-        return abs(row - goal[0]) + abs(col - goal[1])
+        distance = abs(row - goal[0]) + abs(col - goal[1])
+
+        # 最后进入 E 的代价为 0，因此只有前 distance-1 步需要付费。
+        paid_steps = max(distance - 1, 0)
+
+        return paid_steps * minimum_step_cost
 
     def neighbors(position):
         row, col = position
@@ -375,12 +435,12 @@ def treasure_alpha_beta(distances, target_names, target_values,
                 )
 
             ordered_remaining = tuple(
-                sorted(
-                    reachable_targets,
-                    key=move_priority,
-                    reverse=True,
-                )
-            )
+    sorted(
+        reachable_targets,
+        key=move_priority,
+        reverse=True,
+    )
+)
         if maximizing:
             best_value = float("-inf")
             best_target = None
@@ -477,8 +537,32 @@ def treasure_alpha_beta(distances, target_names, target_values,
     return result
 
 def astar_path_stats(start, goal, grid, use_heuristic=True):
+    if not grid or not grid[0]:
+        return [], 0
+
+    if any(len(row) != len(grid[0]) for row in grid):
+        return [], 0
+
     rows = len(grid)
     cols = len(grid[0])
+
+    if (
+        not isinstance(start, (tuple, list))
+        or not isinstance(goal, (tuple, list))
+        or len(start) != 2
+        or len(goal) != 2
+        or not all(isinstance(value, int) for value in start)
+        or not all(isinstance(value, int) for value in goal)
+        or not (0 <= start[0] < rows and 0 <= start[1] < cols)
+        or not (0 <= goal[0] < rows and 0 <= goal[1] < cols)
+    ):
+        return [], 0
+
+    if grid[start[0]][start[1]] == "X":
+        return [], 0
+
+    if grid[goal[0]][goal[1]] == "X":
+        return [], 0
 
     def heuristic(position):
         if not use_heuristic:

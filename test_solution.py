@@ -391,5 +391,159 @@ class TestSearchAlgorithms(unittest.TestCase):
             result["reversed_order"]["value"],
         )
 
+    def test_weighted_astar_with_minimum_cost_above_one(self):
+        grid = [
+            ["S", 2, 2],
+            [2, 9, "E"],
+        ]
+
+        self.assertEqual(
+            weighted_astar_cost((0, 0), (1, 2), grid),
+            4,
+        )
+
+    def test_boundary_inputs(self):
+        self.assertEqual(
+            astar_path((0, 0), (0, 0), []),
+            [],
+        )
+
+        self.assertEqual(
+            astar_path((0, 0), (0, 0), [["S"], [".", "E"]]),
+            [],
+        )
+
+        self.assertEqual(
+            astar_path((-1, 0), (0, 0), [["S"]]),
+            [],
+        )
+
+        self.assertEqual(
+            astar_path((0, 1), (0, 0), [["S"]]),
+            [],
+        )
+
+        maze = [
+            ["S", "X"],
+            [".", "E"],
+        ]
+
+        self.assertEqual(
+            astar_path((0, 0), (0, 1), maze),
+            [],
+        )
+
+        self.assertEqual(
+            astar_path((0, 0), (0, 0), [["S"]]),
+            [(0, 0)],
+        )
+        self.assertEqual(
+            weighted_astar_cost((0, 0), (0, 0), []),
+            -1,
+        )
+
+        self.assertEqual(
+            weighted_astar_cost((0, 0), (0, 0), [["S"], [1, "E"]]),
+            -1,
+        )
+
+        self.assertEqual(
+            weighted_astar_cost((-1, 0), (0, 0), [["S"]]),
+            -1,
+        )
+
+        self.assertEqual(
+            weighted_astar_cost((0, 1), (0, 0), [["S"]]),
+            -1,
+        )
+
+        weighted_grid = [
+            ["S", 1],
+            [1, "E"],
+        ]
+        self.assertEqual(
+            weighted_astar_cost(
+                (0, 0),
+                (0, 2),
+                [["S", "mud", "E"]],
+            ),
+            -1,
+        )
+
+        self.assertEqual(
+            weighted_astar_cost(
+                (0, 0),
+                (0, 2),
+                [["S", -3, "E"]],
+            ),
+            -1,
+        )
+        self.assertEqual(
+            weighted_astar_cost((0, 0), (0, 0), [["S"]]),
+            0,
+        )
+
+        self.assertEqual(
+            weighted_astar_cost((0, 0), (0, 1), [
+                ["X", "E"],
+                [1, "S"],
+            ]),
+            -1,
+        )
+        self.assertEqual(
+            astar_path_stats((0, 0), (0, 0), []),
+            ([], 0),
+        )
+
+        self.assertEqual(
+            astar_path_stats((0, 0), (0, 0), [["S"], [".", "E"]]),
+            ([], 0),
+        )
+
+        self.assertEqual(
+            astar_path_stats((-1, 0), (0, 0), [["S"]]),
+            ([], 0),
+        )
+        self.assertEqual(
+            astar_path_stats(
+                (0, 0),
+                (0, 1),
+                [["X", "E"]],
+            ),
+            ([], 0),
+        )
+
+        self.assertEqual(
+            astar_path_stats(
+                (0, 0),
+                (0, 1),
+                [["S", "X"]],
+            ),
+            ([], 0),
+        )
+        self.assertEqual(
+            astar_path(None, (0, 0), [["S"]]),
+            [],
+        )
+
+        self.assertEqual(
+            astar_path(1, (0, 0), [["S"]]),
+            [],
+        )
+
+        self.assertEqual(
+            weighted_astar_cost(None, (0, 0), [["S"]]),
+            -1,
+        )
+
+        self.assertEqual(
+            weighted_astar_cost(1, (0, 0), [["S"]]),
+            -1,
+        )
+
+        self.assertEqual(
+            astar_path_stats(None, (0, 0), [["S"]]),
+            ([], 0),
+        )
 if __name__ == "__main__":
     unittest.main()
